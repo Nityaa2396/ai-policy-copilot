@@ -46,7 +46,7 @@ Run with: `pytest tests/ -v`
 
 ## Deployment
 
-Live at: [Streamlit Cloud URL — add after deployment]
+Live at: https://ai-policy-copilot.streamlit.app/
 
 ## Implementation notes
 

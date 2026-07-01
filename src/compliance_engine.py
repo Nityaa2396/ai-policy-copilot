@@ -6,6 +6,8 @@ import json
 import os
 from dataclasses import asdict, dataclass
 from typing import Literal
+import hashlib
+from src.vector_store import index_policy, search_chunks, policy_is_indexed
 
 from anthropic import Anthropic
 
@@ -72,13 +74,35 @@ def check_compliance(
 ) -> ComplianceResponse:
     """Return a structured decision for a user AI-use question against the supplied policy.
 
-    If `policy_text` is None or empty, reasoning falls back to general AI frameworks.
-    Callers decide which disclaimer to render based on whether a policy was loaded.
+    V2: Uses Qdrant vector search to find relevant chunks instead of
+    sending the full policy to Claude on every question.
     """
     client = client or Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
     has_policy = bool(policy_text and policy_text.strip())
-    user_content = _build_user_message(question, policy_text, has_policy)
+
+    # V2: use vector search if policy is available
+    if has_policy:
+        # generate a stable ID for this policy
+        policy_id = hashlib.md5(policy_text.encode()).hexdigest()[:16]
+
+        # index policy in Qdrant if not already indexed
+        if not policy_is_indexed(policy_id):
+            index_policy(policy_text, policy_id)
+
+        # retrieve only relevant chunks
+        relevant_chunks = search_chunks(question, policy_id, top_k=3)
+
+        if relevant_chunks:
+            # use only relevant chunks instead of full policy
+            context = "\n\n---\n\n".join(relevant_chunks)
+        else:
+            # fallback to full policy if search returns nothing
+            context = policy_text
+
+        user_content = _build_user_message(question, context, has_policy)
+    else:
+        user_content = _build_user_message(question, policy_text, has_policy)
 
     message = client.messages.create(
         model=MODEL,
@@ -105,7 +129,6 @@ def check_compliance(
         safer_alternative=safer_alternative,
         needs_human_review=needs_human_review,
     )
-
 
 def disclaimer_for(policy_text: str | None) -> str:
     """Return the disclaimer appropriate for whether a policy is loaded."""

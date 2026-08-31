@@ -1,0 +1,254 @@
+[
+  {
+    "id": "q001",
+    "tier": 1,
+    "question": "Can the Engineering team use GitHub Copilot?",
+    "expected_verdict": "Allowed",
+    "expected_citation_section": "Section 2 — Approved AI Tools",
+    "expected_citation_text": "GitHub Copilot — Engineering team only.",
+    "notes": "Direct lookup. Explicitly listed in approved tools table."
+  },
+  {
+    "id": "q002",
+    "tier": 1,
+    "question": "Can a Marketing team member use GitHub Copilot for writing ad copy?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 2 — Approved AI Tools",
+    "expected_citation_text": "Engineering team only.",
+    "notes": "Direct lookup. Copilot is Engineering-only, Marketing is excluded."
+  },
+  {
+    "id": "q003",
+    "tier": 1,
+    "question": "Is it allowed to record a meeting with a client using Otter.ai?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 2 — Approved AI Tools",
+    "expected_citation_text": "Internal meetings only. No client calls without consent.",
+    "notes": "Direct lookup. Otter.ai restriction is explicit."
+  },
+  {
+    "id": "q004",
+    "tier": 1,
+    "question": "Can any employee use Claude for writing assistance?",
+    "expected_verdict": "Allowed",
+    "expected_citation_section": "Section 2 — Approved AI Tools",
+    "expected_citation_text": "All teams. No confidential data without encryption.",
+    "notes": "Direct lookup. Claude approved for all teams."
+  },
+  {
+    "id": "q005",
+    "tier": 1,
+    "question": "Can an employee input customer names and emails into Claude?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 3 — Prohibited Uses",
+    "expected_citation_text": "Inputting personally identifiable information (PII) of customers into any AI tool not certified for PII handling.",
+    "notes": "Direct lookup. Names and emails are PII, prohibited explicitly."
+  },
+  {
+    "id": "q006",
+    "tier": 1,
+    "question": "Can an employee use AI to make a final hiring decision?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 3 — Prohibited Uses",
+    "expected_citation_text": "Using AI to make final decisions on hiring, firing, performance reviews.",
+    "notes": "Direct lookup. AI assist is allowed but not final decision."
+  },
+  {
+    "id": "q007",
+    "tier": 1,
+    "question": "Can an employee use a personal ChatGPT subscription for internal company work?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 3 — Prohibited Uses",
+    "expected_citation_text": "Using personal AI subscriptions (not company-provisioned) for company work involving any data classified as Internal, Confidential, or Restricted.",
+    "notes": "Direct lookup. Personal subscriptions prohibited for company work."
+  },
+  {
+    "id": "q008",
+    "tier": 1,
+    "question": "Does TechNova monitor employee AI tool usage on company devices?",
+    "expected_verdict": "Allowed with caution",
+    "expected_citation_section": "Section 8 — Monitoring and Enforcement",
+    "expected_citation_text": "TechNova IT may monitor AI tool usage on company devices and company-provisioned accounts.",
+    "notes": "Factual lookup. Answer is yes, monitoring is permitted."
+  },
+  {
+    "id": "q009",
+    "tier": 1,
+    "question": "Can an employee use Grammarly to proofread a Restricted document?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 2 — Approved AI Tools",
+    "expected_citation_text": "Grammarly — No restricted documents.",
+    "notes": "Direct lookup. Grammarly has explicit restriction on restricted docs."
+  },
+  {
+    "id": "q010",
+    "tier": 1,
+    "question": "How long does an approved policy exception last?",
+    "expected_verdict": "Allowed with caution",
+    "expected_citation_section": "Section 6 — Escalation and Exceptions",
+    "expected_citation_text": "Approved exceptions are logged in the IT Security exception registry and expire after 90 days.",
+    "notes": "Factual lookup. 90-day expiry is explicit."
+  },
+  {
+    "id": "q011",
+    "tier": 2,
+    "question": "Can a contractor use Claude to summarize an Internal TechNova document?",
+    "expected_verdict": "Allowed with caution",
+    "expected_citation_section": "Section 2 — Approved AI Tools, Section 5 — Contractor and Vendor Rules",
+    "expected_citation_text": "Claude approved for all teams. Contractors must follow same rules as full-time employees.",
+    "notes": "Inference required. Contractor + Internal data + approved tool. All three must be checked."
+  },
+  {
+    "id": "q012",
+    "tier": 2,
+    "question": "Can a contractor use Claude to work with a client's data if their manager verbally said it was fine?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 5 — Contractor and Vendor Rules",
+    "expected_citation_text": "Verbal approval from a TechNova manager does not constitute policy authorization for contractors. Written confirmation is required for every exception.",
+    "notes": "Inference required. Verbal approval is explicitly insufficient for contractors."
+  },
+  {
+    "id": "q013",
+    "tier": 2,
+    "question": "Can an HR employee use Claude to draft a performance review document?",
+    "expected_verdict": "Allowed with caution",
+    "expected_citation_section": "Section 2 — Approved AI Tools, Section 3 — Prohibited Uses",
+    "expected_citation_text": "Claude approved for all teams. AI may assist with drafting, not deciding.",
+    "notes": "Inference required. Drafting is allowed; final decision cannot be AI-made."
+  },
+  {
+    "id": "q014",
+    "tier": 2,
+    "question": "A sales employee wants to use a new AI prospecting tool not on the approved list. Can they try it out to evaluate it?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 2 — Approved AI Tools",
+    "expected_citation_text": "Unapproved tools may not be used even on a trial basis.",
+    "notes": "Inference required. Trial use is explicitly covered and prohibited."
+  },
+  {
+    "id": "q015",
+    "tier": 2,
+    "question": "An employee publishes a blog post that was 40% written by Claude without disclosure. Is this a violation?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 7 — AI-Generated Content and Disclosure",
+    "expected_citation_text": "Any client-facing document where more than 30% of the content was generated by an AI tool must be disclosed.",
+    "notes": "Inference required. 40% exceeds the 30% threshold, disclosure was required."
+  },
+  {
+    "id": "q016",
+    "tier": 2,
+    "question": "Can an engineer use Claude to help write code that will go into production?",
+    "expected_verdict": "Allowed with caution",
+    "expected_citation_section": "Section 2 — Approved AI Tools, Section 7 — AI-Generated Content and Disclosure",
+    "expected_citation_text": "Claude approved for all teams. Code submitted for production deployment where AI generated more than 50% of the logic requires disclosure.",
+    "notes": "Inference required. Allowed but disclosure rule applies if >50% AI-generated."
+  },
+  {
+    "id": "q017",
+    "tier": 2,
+    "question": "Can an employee use Claude with a Confidential document if their manager approves per use?",
+    "expected_verdict": "Allowed with caution",
+    "expected_citation_section": "Section 4 — Data Classification and AI Use",
+    "expected_citation_text": "Confidential: Only tools with signed DPA. Requires manager approval per use.",
+    "notes": "Inference required. Manager approval per use is explicitly required."
+  },
+  {
+    "id": "q018",
+    "tier": 2,
+    "question": "An employee used an unapproved tool urgently to meet a client deadline, then got it approved afterward. Is this okay?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 6 — Escalation and Exceptions",
+    "expected_citation_text": "Exceptions are not retroactive. Using a tool before an exception is approved is a policy violation even if the exception is later granted.",
+    "notes": "Inference required. Retroactive exception explicitly doesn't protect prior use."
+  },
+  {
+    "id": "q019",
+    "tier": 2,
+    "question": "Can an employee use Otter.ai to transcribe a meeting with a client if the client has given verbal consent?",
+    "expected_verdict": "Needs review",
+    "expected_citation_section": "Section 2 — Approved AI Tools",
+    "expected_citation_text": "No client calls without consent.",
+    "notes": "Inference required. Policy says 'without consent' — verbal consent exists but policy doesn't specify written. Escalation recommended."
+  },
+  {
+    "id": "q020",
+    "tier": 2,
+    "question": "Can an employee share unpublished acquisition target information with Claude to draft a summary for their manager?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 3 — Prohibited Uses",
+    "expected_citation_text": "Sharing unpublished financial data, acquisition targets, or M&A activity with any AI tool, approved or not.",
+    "notes": "Inference required. The prohibition applies even to approved tools."
+  },
+  {
+    "id": "q021",
+    "tier": 3,
+    "question": "A contractor has a personal Claude subscription and is using it for TechNova work on publicly available data. Is this allowed?",
+    "expected_verdict": "Needs review",
+    "expected_citation_section": "Section 3 — Prohibited Uses, Section 5 — Contractor and Vendor Rules",
+    "expected_citation_text": "Personal AI subscriptions prohibited for Internal, Confidential, or Restricted data. Contractors must disclose all AI tools used.",
+    "notes": "Edge case. Public data + personal subscription — prohibition only covers Internal/Confidential/Restricted. But disclosure rule still applies. Escalation recommended."
+  },
+  {
+    "id": "q022",
+    "tier": 3,
+    "question": "An employee's manager verbally told them they could use a new unapproved AI tool. Can they use it?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 2 — Approved AI Tools, Section 6 — Escalation and Exceptions",
+    "expected_citation_text": "Unapproved tools may not be used even on a trial basis. Written approval from manager AND IT Security review required.",
+    "notes": "Edge case. Verbal manager approval is not sufficient — written + IT Security required."
+  },
+  {
+    "id": "q023",
+    "tier": 3,
+    "question": "Can an employee use an approved AI tool on a document they are unsure how to classify?",
+    "expected_verdict": "Needs review",
+    "expected_citation_section": "Section 4 — Data Classification and AI Use",
+    "expected_citation_text": "When in doubt about a document's classification, treat it as Confidential.",
+    "notes": "Edge case. Policy instructs treating unknown as Confidential — which requires manager approval per use."
+  },
+  {
+    "id": "q024",
+    "tier": 3,
+    "question": "An employee used Claude to write 25% of an internal report and didn't disclose it. Is this a violation?",
+    "expected_verdict": "Needs review",
+    "expected_citation_section": "Section 7 — AI-Generated Content and Disclosure",
+    "expected_citation_text": "Any internal document submitted as original research or analysis must disclose AI assistance.",
+    "notes": "Edge case. Threshold (30%) not crossed for client-facing, but 'internal document submitted as original research' has its own disclosure rule without a percentage threshold."
+  },
+  {
+    "id": "q025",
+    "tier": 3,
+    "question": "A contractor urgently needs to process Restricted data with an AI tool for a TechNova project. Can their TechNova contact approve this verbally?",
+    "expected_verdict": "Not allowed",
+    "expected_citation_section": "Section 4 — Data Classification and AI Use, Section 5 — Contractor and Vendor Rules",
+    "expected_citation_text": "Restricted data: No AI tools without CISO written approval. Verbal approval not sufficient for contractors.",
+    "notes": "Edge case. Multiple stacked restrictions: Restricted data requires CISO written approval, contractor verbal rule, urgency explicitly not grounds for bypassing."
+  },
+  {
+    "id": "q026",
+    "tier": 3,
+    "question": "Can an employee report a colleague's suspected AI policy violation anonymously?",
+    "expected_verdict": "Allowed",
+    "expected_citation_section": "Section 8 — Monitoring and Enforcement",
+    "expected_citation_text": "Employees are encouraged to report suspected violations by colleagues to the IT Security team anonymously via the internal ethics hotline.",
+    "notes": "Factual edge case. Direct answer exists but most employees wouldn't know to look here."
+  },
+  {
+    "id": "q027",
+    "tier": 3,
+    "question": "An employee's exception was approved 85 days ago. Can they continue using the tool for another 30 days?",
+    "expected_verdict": "Needs review",
+    "expected_citation_section": "Section 6 — Escalation and Exceptions",
+    "expected_citation_text": "Approved exceptions expire after 90 days.",
+    "notes": "Edge case. 85+30=115 days — exceeds 90-day limit. They need to reapply before day 90."
+  },
+  {
+    "id": "q028",
+    "tier": 3,
+    "question": "Can an employee use AI to assist in drafting a termination letter if a manager reviews and approves it?",
+    "expected_verdict": "Allowed with caution",
+    "expected_citation_section": "Section 3 — Prohibited Uses",
+    "expected_citation_text": "AI may assist with drafting, not deciding. Using AI to make final decisions on firing is prohibited.",
+    "notes": "Edge case. Drafting with human review/approval is the key distinction from prohibited final decision-making."
+  }
+]

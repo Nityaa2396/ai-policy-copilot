@@ -43,7 +43,9 @@ def get_full_doc_tokens() -> int:
 
 def score_verdict(output_verdict: str, expected_verdict: str) -> int:
     """1 if verdict matches expected, 0 otherwise."""
-    return int(output_verdict.strip().lower() == expected_verdict.strip().lower())
+    def normalize(v: str) -> str:
+        return v.strip().lower().replace(" ", "_").replace("-", "_")
+    return int(normalize(output_verdict) == normalize(expected_verdict))
 
 
 def score_citation(output_citation: str, expected_section: str) -> int:

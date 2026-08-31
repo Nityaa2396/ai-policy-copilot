@@ -1,4 +1,4 @@
-# TechNova Inc. — AI Usage Policy
+## TechNova Inc. — AI Usage Policy
 **Version 1.0 | Effective: January 2026 | Owner: Legal & IT Compliance**
 
 ---

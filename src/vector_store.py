@@ -25,7 +25,7 @@ def _get_client() -> QdrantClient:
         url=QDRANT_URL,
         api_key=os.getenv("QDRANT_API_KEY"),
     )
-    
+
 def _get_embedding(text: str) -> list[float]:
     """Get embedding using Anthropic's API."""
     client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
@@ -66,6 +66,7 @@ def _simple_embed(text: str, dim: int = 128) -> list[float]:
     client = voyageai.Client(api_key=voyage_key)
     result = client.embed([text], model="voyage-3")
     return result.embeddings[0]
+
 def index_policy(policy_text: str, policy_id: str) -> int:
     """
     Chunk policy and store in Qdrant.
@@ -80,6 +81,12 @@ def index_policy(policy_text: str, policy_id: str) -> int:
             collection_name=COLLECTION_NAME,
             vectors_config=VectorParams(size=1024, distance=Distance.COSINE),
         )
+    # create payload index for policy_id filtering (required by Qdrant Cloud)
+    client.create_payload_index(
+    collection_name=COLLECTION_NAME,
+    field_name="policy_id",
+    field_schema="keyword",
+)
 
     # chunk the policy
     sections = chunk_by_heading(policy_text)

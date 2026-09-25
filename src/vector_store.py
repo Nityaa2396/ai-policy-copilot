@@ -18,13 +18,14 @@ from src.policy_loader import chunk_by_heading
 
 COLLECTION_NAME = "policy_chunks"
 EMBEDDING_MODEL = "voyage-3"
-QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
-
+QDRANT_URL = os.getenv("QDRANT_URL")
 
 def _get_client() -> QdrantClient:
-    return QdrantClient(url=QDRANT_URL)
-
-
+    return QdrantClient(
+        url=QDRANT_URL,
+        api_key=os.getenv("QDRANT_API_KEY"),
+    )
+    
 def _get_embedding(text: str) -> list[float]:
     """Get embedding using Anthropic's API."""
     client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
@@ -41,24 +42,30 @@ def _get_embedding(text: str) -> list[float]:
 
 def _simple_embed(text: str, dim: int = 128) -> list[float]:
     """
-    Simple deterministic embedding using character n-grams.
-    Not semantic but works without extra API calls.
-    Good enough for keyword-level retrieval on policy docs.
+    V3: Semantic embedding using Voyage AI voyage-3 model.
+    Replaces trigram n-gram vectors with real semantic embeddings.
+    Falls back to trigram if Voyage API key is not set.
     """
-    import math
-    vector = [0.0] * dim
-    text = text.lower()
-    for i in range(len(text) - 2):
-        trigram = text[i:i+3]
-        idx = int(hashlib.md5(trigram.encode()).hexdigest(), 16) % dim
-        vector[idx] += 1.0
-    # normalize
-    magnitude = math.sqrt(sum(v * v for v in vector))
-    if magnitude > 0:
-        vector = [v / magnitude for v in vector]
-    return vector
+    import os
+    voyage_key = os.environ.get("VOYAGE_API_KEY")
+    if not voyage_key:
+        # fallback to trigram if no Voyage key
+        import math
+        vector = [0.0] * dim
+        text_lower = text.lower()
+        for i in range(len(text_lower) - 2):
+            trigram = text_lower[i:i+3]
+            idx = int(hashlib.md5(trigram.encode()).hexdigest(), 16) % dim
+            vector[idx] += 1.0
+        magnitude = math.sqrt(sum(v * v for v in vector))
+        if magnitude > 0:
+            vector = [v / magnitude for v in vector]
+        return vector
 
-
+    import voyageai
+    client = voyageai.Client(api_key=voyage_key)
+    result = client.embed([text], model="voyage-3")
+    return result.embeddings[0]
 def index_policy(policy_text: str, policy_id: str) -> int:
     """
     Chunk policy and store in Qdrant.
@@ -71,7 +78,7 @@ def index_policy(policy_text: str, policy_id: str) -> int:
     if COLLECTION_NAME not in existing:
         client.create_collection(
             collection_name=COLLECTION_NAME,
-            vectors_config=VectorParams(size=128, distance=Distance.COSINE),
+            vectors_config=VectorParams(size=1024, distance=Distance.COSINE),
         )
 
     # chunk the policy

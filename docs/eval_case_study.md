@@ -188,5 +188,23 @@ improvement. Each version was evaluated against the same 28-question ground trut
 dataset, making the comparison reproducible and the claims verifiable.
 
 The token efficiency gain (47.2% reduction) with accuracy parity (96.4% citation,
-78.6% verdict) is the headline result. The V4 direction (dynamic top-k) is the
-next measurable hypothesis.
+78.6% verdict) is the headline result.
+
+---
+
+## V4 Update — Dynamic Top-k (Live, Eval In Progress)
+
+V4 ships the dynamic top-k hypothesis as a live change to `compliance_engine.py`.
+A lightweight classifier runs before retrieval and determines how many chunks to send:
+
+- Tier 1 (direct lookup) → 1 chunk
+- Tier 2 (inference) → 2 chunks  
+- Tier 3 (edge cases) → 3 chunks
+
+Smoke test confirms correct behavior:
+
+- "Can Engineering use GitHub Copilot?" → `allowed` | Section 2 — Approved AI Tools (1 chunk)
+- "Can a contractor use Claude on Internal data?" → `not_allowed` | Section 5 — Contractor and Vendor Rules (2 chunks)
+
+Full eval against the 28-question ground truth dataset is the next step to measure
+the token reduction and confirm accuracy holds across all tiers.

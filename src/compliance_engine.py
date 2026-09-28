@@ -65,6 +65,23 @@ class ComplianceResponse:
     def to_dict(self) -> dict:
         return asdict(self)
 
+def _classify_question(question: str, client: Anthropic) -> int:
+    """
+    Classify question complexity to determine how many chunks to retrieve.
+    Returns top_k: 1 for direct lookup, 2 for inference, 3 for edge cases.
+    """
+    response = client.messages.create(
+        model=MODEL,
+        max_tokens=10,
+        system="Classify this compliance question. Reply with ONLY a single digit: 1 if the answer is likely in one policy section, 2 if it requires combining multiple sections, 3 if it is ambiguous or an edge case.",
+        messages=[{"role": "user", "content": question}],
+    )
+    for block in response.content:
+        if getattr(block, "type", None) == "text":
+            digit = block.text.strip()
+            if digit in ("1", "2", "3"):
+                return int(digit)
+    return 2  # default to 2 if classification fails
 
 def check_compliance(
     question: str,
@@ -91,7 +108,8 @@ def check_compliance(
             index_policy(policy_text, policy_id)
 
         # retrieve only relevant chunks
-        relevant_chunks = search_chunks(question, policy_id, top_k=3)
+        top_k = _classify_question(question, client)
+        relevant_chunks = search_chunks(question, policy_id, top_k=top_k)
 
         if relevant_chunks:
             # use only relevant chunks instead of full policy

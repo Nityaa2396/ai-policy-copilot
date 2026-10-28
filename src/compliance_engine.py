@@ -65,40 +65,73 @@ class ComplianceResponse:
     def to_dict(self) -> dict:
         return asdict(self)
 
-def _classify_question(question: str, client: Anthropic) -> int:
+
+CLASSIFIER_SYSTEM = (
+    "Classify this compliance question. Reply with ONLY a single digit: 1 if the "
+    "answer is likely in one policy section, 2 if it requires combining multiple "
+    "sections, 3 if it is ambiguous or an edge case."
+)
+
+
+def _classify_question_with_usage(question: str, client: Anthropic) -> tuple[int, int, int]:
     """
     Classify question complexity to determine how many chunks to retrieve.
-    Returns top_k: 1 for direct lookup, 2 for inference, 3 for edge cases.
+    Returns (top_k, input_tokens, output_tokens). top_k: 1 direct lookup,
+    2 inference, 3 edge case. Token counts come from the API usage field.
     """
     response = client.messages.create(
         model=MODEL,
         max_tokens=10,
-        system="Classify this compliance question. Reply with ONLY a single digit: 1 if the answer is likely in one policy section, 2 if it requires combining multiple sections, 3 if it is ambiguous or an edge case.",
+        system=CLASSIFIER_SYSTEM,
         messages=[{"role": "user", "content": question}],
     )
+    in_tok = getattr(response.usage, "input_tokens", 0)
+    out_tok = getattr(response.usage, "output_tokens", 0)
     for block in response.content:
         if getattr(block, "type", None) == "text":
             digit = block.text.strip()
             if digit in ("1", "2", "3"):
-                return int(digit)
-    return 2  # default to 2 if classification fails
+                return int(digit), in_tok, out_tok
+    return 2, in_tok, out_tok  # default to 2 if classification fails
+
+
+def _classify_question(question: str, client: Anthropic) -> int:
+    """Backward-compatible wrapper returning only top_k."""
+    return _classify_question_with_usage(question, client)[0]
+
 
 def check_compliance(
     question: str,
     policy_text: str | None,
     *,
     client: Anthropic | None = None,
+    trace: dict | None = None,
+    fixed_top_k: int | None = None,
 ) -> ComplianceResponse:
     """Return a structured decision for a user AI-use question against the supplied policy.
 
-    V2: Uses Qdrant vector search to find relevant chunks instead of
-    sending the full policy to Claude on every question.
+    Uses Qdrant vector search to find relevant chunks instead of sending the
+    full policy on every question. top_k is chosen by a classifier call (V4)
+    unless fixed_top_k is given (used to measure the fixed-k baseline).
+
+    If `trace` (a dict) is passed, it is filled with what was actually sent:
+    top_k, chunks_retrieved, used_full_policy_fallback, and real API token
+    usage for the classifier and the main call.
     """
     client = client or Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
     has_policy = bool(policy_text and policy_text.strip())
 
-    # V2: use vector search if policy is available
+    t = {
+        "top_k": None,
+        "chunks_retrieved": 0,
+        "used_full_policy_fallback": False,
+        "classifier_input_tokens": 0,
+        "classifier_output_tokens": 0,
+        "main_input_tokens": 0,
+        "main_output_tokens": 0,
+    }
+
     if has_policy:
         # generate a stable ID for this policy
         policy_id = hashlib.md5(policy_text.encode()).hexdigest()[:16]
@@ -107,16 +140,24 @@ def check_compliance(
         if not policy_is_indexed(policy_id):
             index_policy(policy_text, policy_id)
 
-        # retrieve only relevant chunks
-        top_k = _classify_question(question, client)
+        # choose how many chunks to retrieve
+        if fixed_top_k is not None:
+            top_k = fixed_top_k
+        else:
+            top_k, c_in, c_out = _classify_question_with_usage(question, client)
+            t["classifier_input_tokens"] = c_in
+            t["classifier_output_tokens"] = c_out
+        t["top_k"] = top_k
+
         relevant_chunks = search_chunks(question, policy_id, top_k=top_k)
+        t["chunks_retrieved"] = len(relevant_chunks)
 
         if relevant_chunks:
-            # use only relevant chunks instead of full policy
             context = "\n\n---\n\n".join(relevant_chunks)
         else:
             # fallback to full policy if search returns nothing
             context = policy_text
+            t["used_full_policy_fallback"] = True
 
         user_content = _build_user_message(question, context, has_policy)
     else:
@@ -128,6 +169,10 @@ def check_compliance(
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_content}],
     )
+    t["main_input_tokens"] = getattr(message.usage, "input_tokens", 0)
+    t["main_output_tokens"] = getattr(message.usage, "output_tokens", 0)
+    if trace is not None:
+        trace.update(t)
 
     raw = _extract_text(message)
     payload = _parse_json(raw)
